@@ -2,15 +2,19 @@ package com.a2sdm.need.doctors.jwt.controller;
 
 
 
+import com.a2sdm.need.doctors.dto.response.MessageResponse;
+import com.a2sdm.need.doctors.jwt.dto.request.EditProfile;
 import com.a2sdm.need.doctors.jwt.dto.request.LoginForm;
 import com.a2sdm.need.doctors.jwt.dto.request.SignUpForm;
 import com.a2sdm.need.doctors.jwt.dto.response.BasicResponse;
 import com.a2sdm.need.doctors.jwt.dto.response.JwtResponse;
 import com.a2sdm.need.doctors.jwt.dto.response.UserResponse;
+import com.a2sdm.need.doctors.jwt.services.ProfileService;
 import com.a2sdm.need.doctors.jwt.services.SignUpAndSignInService;
 import javassist.bytecode.DuplicateMemberException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +28,7 @@ import javax.validation.Valid;
 public class AuthController {
 
     private final SignUpAndSignInService signUpAndSignInService;
+    private final ProfileService profileService;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
@@ -40,16 +45,20 @@ public class AuthController {
         return signUpAndSignInService.verifyOTP(phoneNo,otp);
     }
 
-
-
     @GetMapping("/profile")
     public ResponseEntity<UserResponse> getLoggedProfileInfo() {
-        return signUpAndSignInService.getUserProfile();
+        return profileService.getUserProfile();
+    }
+
+    @PutMapping("/profile/edit")
+    public ResponseEntity<MessageResponse> editProfileInfo(@RequestBody EditProfile editProfile,
+                                                           @RequestHeader(name = "Authorization") String token) {
+        return profileService.editUserProfile(token, editProfile);
     }
 
     @GetMapping("/serverCheck")
-    public String getServerStatStatus() {
-        return "<h1>The Server is Running</h1>";
+    public ResponseEntity<MessageResponse> getServerStatStatus() {
+        return new ResponseEntity<>(new MessageResponse("Server is Running"), HttpStatus.OK);
     }
 
 }

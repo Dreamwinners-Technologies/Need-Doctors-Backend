@@ -11,6 +11,7 @@ import com.a2sdm.need.doctors.model.CardModel;
 import com.a2sdm.need.doctors.repository.CardInfoRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import liquibase.pro.packaged.O;
 import lombok.AllArgsConstructor;
 import org.cloudinary.json.JSONObject;
 import org.springframework.data.domain.*;
@@ -36,7 +37,7 @@ public class CardInfoService {
 
         String randomId = UUID.randomUUID().toString();
 
-        String addedBy = jwtProvider.getUserNameFromJwtToken(token.split("\\s+")[1]);
+        String addedBy = jwtProvider.getUserNameFromJwtToken(token);
 
         CardModel cardModel = new CardModel(
                 randomId, addedBy, cardInfoRequest.getName(), cardInfoRequest.getAppointmentNo(),
@@ -105,5 +106,39 @@ public class CardInfoService {
 
         return new ResponseEntity<CardListResponse>(cardListResponse, HttpStatus.OK);
 
+    }
+
+    public ResponseEntity<MessageIdResponse> editCardInfo(CardInfoAddRequest cardInfoAddRequest, String cardId) {
+        Optional<CardModel> cardModelOptional = cardInfoRepository.findById(cardId);
+
+        if(cardModelOptional.isPresent()){
+            CardModel cardModel = cardModelOptional.get();
+
+            cardModel.setName(cardInfoAddRequest.getName());
+            cardModel.setAppointmentNo(cardInfoAddRequest.getAppointmentNo());
+            cardModel.setSpecialization(cardInfoAddRequest.getSpecialization());
+            cardModel.setThana(cardInfoAddRequest.getThana());
+            cardModel.setDistrict(cardInfoAddRequest.getDistrict());
+
+            cardInfoRepository.save(cardModel);
+
+            return new ResponseEntity<>(new MessageIdResponse("Edit Successful",cardId),HttpStatus.OK);
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong/ Card Not Found");
+        }
+    }
+
+    public ResponseEntity<MessageIdResponse> deleteCardInfo(String cardId) {
+        Optional<CardModel> cardModelOptional = cardInfoRepository.findById(cardId);
+
+        if(cardModelOptional.isPresent()){
+            cardInfoRepository.deleteById(cardId);
+
+            return new ResponseEntity<>(new MessageIdResponse("Card Deleted Successful", cardId),HttpStatus.OK);
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong/ Card Not Found");
+        }
     }
 }

@@ -68,9 +68,17 @@ public class JwtProvider {
     }
 
     public String getUserNameFromJwtToken(String token) {
+        token = token.split("\\s+")[1];
         return Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody().getSubject();
+    }
+
+    public String getRolesFromJwtToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody().get("scopes").toString();
     }
 }
