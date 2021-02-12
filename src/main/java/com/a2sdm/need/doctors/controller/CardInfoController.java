@@ -21,9 +21,9 @@ public class CardInfoController {
 
     @PostMapping
     public ResponseEntity<MessageIdResponse> addCardInfo(@RequestBody CardInfoAddRequest cardInfoAddRequest,
-                                                         @RequestHeader (name="Authorization") String token) {
+                                                         @RequestHeader(name = "Authorization") String token) {
 
-        return cardInfoService.addCardInfo(cardInfoAddRequest,token);
+        return cardInfoService.addCardInfo(cardInfoAddRequest, token);
     }
 
     @PostMapping("/addImage/{cardId}")
@@ -47,12 +47,12 @@ public class CardInfoController {
 
     @PutMapping("/edit/{cardId}")
     public ResponseEntity<MessageIdResponse> editCard(@RequestBody CardInfoAddRequest cardInfoAddRequest,
-                                   @PathVariable String cardId){
+                                                      @PathVariable String cardId) {
         return cardInfoService.editCardInfo(cardInfoAddRequest, cardId);
     }
 
     @DeleteMapping("/edit/{cardId}")
-    public ResponseEntity<MessageIdResponse> deleteCard(@PathVariable String cardId){
+    public ResponseEntity<MessageIdResponse> deleteCard(@PathVariable String cardId) {
         return cardInfoService.deleteCardInfo(cardId);
     }
 
