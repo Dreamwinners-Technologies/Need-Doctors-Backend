@@ -4,6 +4,7 @@ import com.a2sdm.need.doctors.jwt.dto.request.LoginForm;
 import com.a2sdm.need.doctors.jwt.dto.request.SignUpForm;
 import com.a2sdm.need.doctors.jwt.dto.response.BasicResponse;
 import com.a2sdm.need.doctors.jwt.dto.response.JwtResponse;
+import com.a2sdm.need.doctors.jwt.dto.response.UserResponse;
 import com.a2sdm.need.doctors.jwt.model.Role;
 import com.a2sdm.need.doctors.jwt.model.RoleName;
 import com.a2sdm.need.doctors.jwt.model.UserModel;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -89,14 +91,13 @@ public class SignUpAndSignInService {
             userModel.setGeneratedOTP(random_int);
             userModel.setTimeStamp(System.currentTimeMillis());
 
-            System.out.println("OTP is "+random_int);
+            System.out.println("OTP is " + random_int);
 
             userRepository.save(userModel);
 
             return sendOTP(userModel);
-        }
-        else{
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User Not Found");
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User Not Found");
         }
     }
 
@@ -105,14 +106,14 @@ public class SignUpAndSignInService {
 
         String apiUrl = "http://api.greenweb.com.bd/api.php";
         String smsAccessToken = "5207d3f7af0d432db628fc70c63a1c10";
-        String smsText = "Hi, Your Need Doctor's App's OTP is: " + userModel.getGeneratedOTP()+".\nThanks";
+        String smsText = "Hi, Your Need Doctor's App's OTP is: " + userModel.getGeneratedOTP() + ".\nThanks";
         String sendTo = userModel.getPhoneNo();
 
-        String finalUrl = apiUrl+"?token="+smsAccessToken+"&to="+sendTo+"&message="+smsText;
+        String finalUrl = apiUrl + "?token=" + smsAccessToken + "&to=" + sendTo + "&message=" + smsText;
 
         //http://api.greenweb.com.bd/api.php?token=tokencodehere&to=017xxxxxxxx,015xxxxxxxx&message=my+message+is+here
 
-        ResponseEntity<String> response = restTemplate.getForEntity(finalUrl,String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity(finalUrl, String.class);
 
         System.out.println(response.getStatusCodeValue());
         System.out.println(response.getStatusCode());
@@ -128,8 +129,8 @@ public class SignUpAndSignInService {
         if (userModelOptional.isPresent()) {
             UserModel userModel = userModelOptional.get();
 
-            if(userModel.getGeneratedOTP()==0){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No OTP Found");
+            if (userModel.getGeneratedOTP() == 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No OTP Found");
             }
 
             long timeDifferance = userModel.getTimeStamp() - System.currentTimeMillis();
@@ -140,15 +141,13 @@ public class SignUpAndSignInService {
 
                 userRepository.save(userModel);
 
-                JwtResponse jwtResponse = generateJWT(userModel,false);
+                JwtResponse jwtResponse = generateJWT(userModel, false);
 
                 return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
-            }
-            else if(timeDifferance > 300000){
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"OTP Expired");
-            }
-            else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Wrong OTP");
+            } else if (timeDifferance > 300000) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "OTP Expired");
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong OTP");
             }
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong Phone No");
@@ -158,19 +157,17 @@ public class SignUpAndSignInService {
     public JwtResponse generateJWT(UserModel userModel, boolean isNeedToSendOTP) {
         Set<String> rolesInDB = getRolesStringFromRole(userModel.getRoles());
 
-        if((rolesInDB.contains("SUPER_ADMIN") || rolesInDB.contains("ADMIN")
-                || rolesInDB.contains("MODERATOR") || rolesInDB.contains("DOCTOR")) && isNeedToSendOTP){
+        if ((rolesInDB.contains("SUPER_ADMIN") || rolesInDB.contains("ADMIN")
+                || rolesInDB.contains("MODERATOR") || rolesInDB.contains("DOCTOR")) && isNeedToSendOTP) {
             JwtResponse jwtResponse = new JwtResponse(null, null, userModel.getPhoneNo(), rolesInDB);
             boolean isOTPSent = generateAndSendOTP(userModel.getPhoneNo());
 
-            if(isOTPSent){
+            if (isOTPSent) {
                 return jwtResponse;
+            } else {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There is a problem in OTP sending");
             }
-            else {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"There is a problem in OTP sending");
-            }
-        }
-        else {
+        } else {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             userModel.getUsername(),
@@ -195,12 +192,12 @@ public class SignUpAndSignInService {
 
         if (userModelOptional.isPresent()) {
             UserModel userModel = userModelOptional.get();
-            JwtResponse jwtResponse = generateJWT(userModel,true);
+            JwtResponse jwtResponse = generateJWT(userModel, true);
 
-            return new ResponseEntity<>(jwtResponse,HttpStatus.OK);
+            return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
 
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User Not Exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Exists");
         }
     }
 
@@ -258,6 +255,36 @@ public class SignUpAndSignInService {
             roles.add(role.getName().toString());
         }
         return roles;
+    }
+
+
+    public ResponseEntity<UserResponse> getUserProfile() {
+        Object authUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (authUser instanceof UserDetails) {
+            String username = ((UserDetails) authUser).getUsername();
+
+            Optional<UserModel> userOptional = userRepository.findByUsername(username);
+
+            if (userOptional.isPresent()) {
+                UserModel user = userOptional.get();
+
+                UserResponse userResponse = new UserResponse(user.getName(), user.getQualification(),
+                        user.getOrganization(), user.getDesignation(), user.getPhoneNo(),
+                        user.getBmdcRegistrationNo(), user.getSpecialization(), user.getThana(), user.getDistrict()
+
+                );
+
+                return new ResponseEntity<>(userResponse, HttpStatus.OK);
+
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User Not Found");
+            }
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"There's a problem in JWT Token");
+        }
+
     }
 
 

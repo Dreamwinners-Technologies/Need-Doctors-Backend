@@ -42,10 +42,10 @@ public class AuthController {
 
 
 
-//    @GetMapping("/profile")
-//    public ResponseEntity<UserResponse> getLoggedProfileInfo() {
-//        return signUpAndSignInService.getLoggedAuthUser();
-//    }
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponse> getLoggedProfileInfo() {
+        return signUpAndSignInService.getUserProfile();
+    }
 
     @GetMapping("/serverCheck")
     public String getServerStatStatus() {
