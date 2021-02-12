@@ -76,8 +76,7 @@ public class CardInfoService {
             aFile.transferTo(f);
             Map response = c.uploader().upload(f, ObjectUtils.emptyMap());
             JSONObject json = new JSONObject(response);
-            String url = json.getString("url");
-            return url;
+            return json.getString("url");
 
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File Upload Failed");
@@ -104,7 +103,7 @@ public class CardInfoService {
         CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize,cardModelList.isLast(),
                 cardModelList.getTotalElements(),cardModelList.getTotalPages(),cardModelList.getContent());
 
-        return new ResponseEntity<CardListResponse>(cardListResponse, HttpStatus.OK);
+        return new ResponseEntity<>(cardListResponse, HttpStatus.OK);
 
     }
 

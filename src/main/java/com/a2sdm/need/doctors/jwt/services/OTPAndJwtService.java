@@ -91,11 +91,11 @@ public class OTPAndJwtService {
 
         //http://api.greenweb.com.bd/api.php?token=tokencodehere&to=017xxxxxxxx,015xxxxxxxx&message=my+message+is+here
 
-//        ResponseEntity<String> response = restTemplate.getForEntity(finalUrl, String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity(finalUrl, String.class);
 
-//        System.out.println(response.getStatusCodeValue());
-//        System.out.println(response.getStatusCode());
-//        System.out.println(response.getBody());
+        System.out.println(response.getStatusCodeValue());
+        System.out.println(response.getStatusCode());
+        System.out.println(response.getBody());
 
         System.out.println("OTP Sent");
         return true;
@@ -126,10 +126,8 @@ public class OTPAndJwtService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwtToken = jwtProvider.generateJwtToken(authentication);
 
-            JwtResponse jwtResponse = new JwtResponse(jwtToken, userModel.getName(),
+            return new JwtResponse(jwtToken, userModel.getName(),
                     userModel.getPhoneNo(), utilServices.getRolesStringFromRole(userModel.getRoles()));
-
-            return jwtResponse;
         }
 
     }
