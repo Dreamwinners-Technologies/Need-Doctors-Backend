@@ -26,8 +26,8 @@ public class CardInfoController {
         return cardInfoService.addCardInfo(cardInfoAddRequest,token);
     }
 
-    @PostMapping("/addImage")
-    public ResponseEntity<MessageResponse> addCardImage(@RequestParam String cardId,
+    @PostMapping("/addImage/{cardId}")
+    public ResponseEntity<MessageResponse> addCardImage(@PathVariable String cardId,
                                                         @RequestParam(value = "file", required = false) MultipartFile aFile)
             throws IOException {
 
@@ -43,6 +43,17 @@ public class CardInfoController {
                                                         @RequestParam(required = false) String district
     ) {
         return cardInfoService.getCardList(pageNo, pageSize, name, specialization, thana, district);
+    }
+
+    @PutMapping("/edit/{cardId}")
+    public ResponseEntity<MessageIdResponse> editCard(@RequestBody CardInfoAddRequest cardInfoAddRequest,
+                                   @PathVariable String cardId){
+        return cardInfoService.editCardInfo(cardInfoAddRequest, cardId);
+    }
+
+    @DeleteMapping("/edit/{cardId}")
+    public ResponseEntity<MessageIdResponse> deleteCard(@PathVariable String cardId){
+        return cardInfoService.deleteCardInfo(cardId);
     }
 
 }

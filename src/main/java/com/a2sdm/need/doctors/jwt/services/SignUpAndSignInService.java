@@ -1,5 +1,7 @@
 package com.a2sdm.need.doctors.jwt.services;
 
+import com.a2sdm.need.doctors.dto.response.MessageResponse;
+import com.a2sdm.need.doctors.jwt.dto.request.EditProfile;
 import com.a2sdm.need.doctors.jwt.dto.request.LoginForm;
 import com.a2sdm.need.doctors.jwt.dto.request.SignUpForm;
 import com.a2sdm.need.doctors.jwt.dto.response.BasicResponse;
@@ -11,6 +13,8 @@ import com.a2sdm.need.doctors.jwt.model.UserModel;
 import com.a2sdm.need.doctors.jwt.repository.RoleRepository;
 import com.a2sdm.need.doctors.jwt.repository.UserRepository;
 import com.a2sdm.need.doctors.jwt.security.jwt.JwtProvider;
+import com.a2sdm.need.doctors.model.CardModel;
+import com.a2sdm.need.doctors.repository.CardInfoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +44,7 @@ public class SignUpAndSignInService {
     AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final CardInfoRepository cardInfoRepository;
 
     public ResponseEntity<BasicResponse> signUp(SignUpForm signUpRequest) {
 
@@ -52,11 +57,23 @@ public class SignUpAndSignInService {
 
         boolean sendOTPStatus = generateAndSendOTP(signUpRequest.getPhoneNo());
 
+        if(signUpRequest.getRole().contains("DOCTOR")){
+            saveCard(signUpRequest);
+        }
+
         if (sendOTPStatus) {
             return new ResponseEntity<>(new BasicResponse("Account Created"), HttpStatus.CREATED);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Went Wrong");
         }
+    }
+
+    private void saveCard(SignUpForm signUpRequest) {
+        CardModel cardModel = new CardModel(UUID.randomUUID().toString(),"u"+ signUpRequest.getPhoneNo(),
+                signUpRequest.getName(),"xxxxxxxxxxx", signUpRequest.getSpecialization(), signUpRequest.getThana(),
+                signUpRequest.getDistrict(),"");
+
+        cardInfoRepository.save(cardModel);
     }
 
     private UserModel saveSignUpInfo(SignUpForm signUpRequest) {
@@ -73,7 +90,7 @@ public class SignUpAndSignInService {
                 .bmdcRegistrationNo(signUpRequest.getBmdcRegistrationNo())
                 .district(signUpRequest.getDistrict())
                 .thana(signUpRequest.getThana())
-                .username(signUpRequest.getPhoneNo())
+                .username("u"+signUpRequest.getPhoneNo())
                 .password(encoder.encode("00000000"))
                 .build();
 
@@ -113,11 +130,11 @@ public class SignUpAndSignInService {
 
         //http://api.greenweb.com.bd/api.php?token=tokencodehere&to=017xxxxxxxx,015xxxxxxxx&message=my+message+is+here
 
-        ResponseEntity<String> response = restTemplate.getForEntity(finalUrl, String.class);
+//        ResponseEntity<String> response = restTemplate.getForEntity(finalUrl, String.class);
 
-        System.out.println(response.getStatusCodeValue());
-        System.out.println(response.getStatusCode());
-        System.out.println(response.getBody());
+//        System.out.println(response.getStatusCodeValue());
+//        System.out.println(response.getStatusCode());
+//        System.out.println(response.getBody());
 
         System.out.println("OTP Sent");
         return true;
@@ -201,40 +218,6 @@ public class SignUpAndSignInService {
         }
     }
 
-//    public ResponseEntity<UserResponse> getLoggedAuthUser() {
-//
-//        Object authUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        if (authUser instanceof UserDetails) {
-//            String username = ((UserDetails) authUser).getUsername();
-//
-//            Optional<User> userOptional = userRepository.findByUsername(username);
-//
-//            if (userOptional.isPresent()) {
-//                User user = userOptional.get();
-//
-//                UserResponse userResponse = new UserResponse(user.getUsername(), user.getEmail(), user.getFirstName(),
-//                        user.getLastName(), user.getPhoneNo(), getRolesStringFromRole(user.getRoles()));
-//
-//                HttpHeaders httpHeaders = new HttpHeaders();
-//                httpHeaders.add("massage", "OK");
-//                return new ResponseEntity(userResponse, httpHeaders, HttpStatus.OK);
-//
-//
-//            } else {
-//                HttpHeaders httpHeaders = new HttpHeaders();
-//                httpHeaders.add("massage", "No User Found");
-//                return new ResponseEntity(new UserResponse(), httpHeaders, HttpStatus.NO_CONTENT);
-//            }
-//
-//        } else {
-//            HttpHeaders httpHeaders = new HttpHeaders();
-//            httpHeaders.add("massage", "Unauthenticated");
-//            return new ResponseEntity(new UserResponse(), httpHeaders, HttpStatus.UNAUTHORIZED);
-//        }
-//
-//    }
-
 
     public Set<Role> getRolesFromStringToRole(Set<String> roles2) {
         Set<Role> roles = new HashSet<>();
@@ -257,35 +240,6 @@ public class SignUpAndSignInService {
         return roles;
     }
 
-
-    public ResponseEntity<UserResponse> getUserProfile() {
-        Object authUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (authUser instanceof UserDetails) {
-            String username = ((UserDetails) authUser).getUsername();
-
-            Optional<UserModel> userOptional = userRepository.findByUsername(username);
-
-            if (userOptional.isPresent()) {
-                UserModel user = userOptional.get();
-
-                UserResponse userResponse = new UserResponse(user.getName(), user.getQualification(),
-                        user.getOrganization(), user.getDesignation(), user.getPhoneNo(),
-                        user.getBmdcRegistrationNo(), user.getSpecialization(), user.getThana(), user.getDistrict()
-
-                );
-
-                return new ResponseEntity<>(userResponse, HttpStatus.OK);
-
-            } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User Not Found");
-            }
-        }
-        else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"There's a problem in JWT Token");
-        }
-
-    }
 
 
 }
