@@ -1,14 +1,9 @@
 package com.a2sdm.need.doctors.jwt.services;
 
-import com.a2sdm.need.doctors.dto.response.MessageResponse;
-import com.a2sdm.need.doctors.jwt.dto.request.EditProfile;
 import com.a2sdm.need.doctors.jwt.dto.request.LoginForm;
 import com.a2sdm.need.doctors.jwt.dto.request.SignUpForm;
 import com.a2sdm.need.doctors.jwt.dto.response.BasicResponse;
 import com.a2sdm.need.doctors.jwt.dto.response.JwtResponse;
-import com.a2sdm.need.doctors.jwt.dto.response.UserResponse;
-import com.a2sdm.need.doctors.jwt.model.Role;
-import com.a2sdm.need.doctors.jwt.model.RoleName;
 import com.a2sdm.need.doctors.jwt.model.UserModel;
 import com.a2sdm.need.doctors.jwt.repository.RoleRepository;
 import com.a2sdm.need.doctors.jwt.repository.UserRepository;
@@ -19,20 +14,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -40,24 +27,26 @@ import java.util.UUID;
 public class SignUpAndSignInService {
 
     PasswordEncoder encoder;
-    JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
     AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final CardInfoRepository cardInfoRepository;
+    private final OTPAndJwtService otpAndJwtService;
+    private final UtilServices utilServices;
 
     public ResponseEntity<BasicResponse> signUp(SignUpForm signUpRequest) {
 
         if (userRepository.existsByPhoneNo(signUpRequest.getPhoneNo())) {
-            //return true;
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone No Already Exits");
         }
 
         UserModel userModel = saveSignUpInfo(signUpRequest);
 
-        boolean sendOTPStatus = generateAndSendOTP(signUpRequest.getPhoneNo());
+        int generatedOtp = otpAndJwtService.generateOTP(signUpRequest.getPhoneNo());
+        boolean sendOTPStatus = otpAndJwtService.sendOTP(generatedOtp,signUpRequest.getPhoneNo());
 
-        if(signUpRequest.getRole().contains("DOCTOR")){
+        if (signUpRequest.getRole().contains("DOCTOR")) {
             saveCard(signUpRequest);
         }
 
@@ -69,9 +58,9 @@ public class SignUpAndSignInService {
     }
 
     private void saveCard(SignUpForm signUpRequest) {
-        CardModel cardModel = new CardModel(UUID.randomUUID().toString(),"u"+ signUpRequest.getPhoneNo(),
-                signUpRequest.getName(),"xxxxxxxxxxx", signUpRequest.getSpecialization(), signUpRequest.getThana(),
-                signUpRequest.getDistrict(),"");
+        CardModel cardModel = new CardModel(UUID.randomUUID().toString(), "u" + signUpRequest.getPhoneNo(),
+                signUpRequest.getName(), "xxxxxxxxxxx", signUpRequest.getSpecialization(), signUpRequest.getThana(),
+                signUpRequest.getDistrict(), "");
 
         cardInfoRepository.save(cardModel);
     }
@@ -85,122 +74,17 @@ public class SignUpAndSignInService {
                 .id(uuid)
                 .Name(signUpRequest.getName())
                 .phoneNo(signUpRequest.getPhoneNo())
-                .roles(getRolesFromStringToRole(signUpRequest.getRole()))
+                .roles(utilServices.getRolesFromStringToRole(signUpRequest.getRole()))
                 .specialization(signUpRequest.getSpecialization())
                 .bmdcRegistrationNo(signUpRequest.getBmdcRegistrationNo())
                 .district(signUpRequest.getDistrict())
                 .thana(signUpRequest.getThana())
-                .username("u"+signUpRequest.getPhoneNo())
+                .username("u" + signUpRequest.getPhoneNo())
                 .password(encoder.encode("00000000"))
                 .build();
 
         userRepository.saveAndFlush(userModel);
         return userModel;
-    }
-
-    private boolean generateAndSendOTP(String phoneNo) {
-        Optional<UserModel> userModelOptional = userRepository.findByPhoneNo(phoneNo);
-
-        if (userModelOptional.isPresent()) {
-            UserModel userModel = userModelOptional.get();
-
-            int random_int = (int) (Math.random() * (999999 - 100000 + 1) + 100000);
-            userModel.setGeneratedOTP(random_int);
-            userModel.setTimeStamp(System.currentTimeMillis());
-
-            System.out.println("OTP is " + random_int);
-
-            userRepository.save(userModel);
-
-            return sendOTP(userModel);
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User Not Found");
-        }
-    }
-
-    private boolean sendOTP(UserModel userModel) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        String apiUrl = "http://api.greenweb.com.bd/api.php";
-        String smsAccessToken = "5207d3f7af0d432db628fc70c63a1c10";
-        String smsText = "Hi, Your Need Doctor's App's OTP is: " + userModel.getGeneratedOTP() + ".\nThanks";
-        String sendTo = userModel.getPhoneNo();
-
-        String finalUrl = apiUrl + "?token=" + smsAccessToken + "&to=" + sendTo + "&message=" + smsText;
-
-        //http://api.greenweb.com.bd/api.php?token=tokencodehere&to=017xxxxxxxx,015xxxxxxxx&message=my+message+is+here
-
-//        ResponseEntity<String> response = restTemplate.getForEntity(finalUrl, String.class);
-
-//        System.out.println(response.getStatusCodeValue());
-//        System.out.println(response.getStatusCode());
-//        System.out.println(response.getBody());
-
-        System.out.println("OTP Sent");
-        return true;
-    }
-
-    public ResponseEntity<JwtResponse> verifyOTP(String phoneNo, int otp) {
-        Optional<UserModel> userModelOptional = userRepository.findByPhoneNo(phoneNo);
-
-        if (userModelOptional.isPresent()) {
-            UserModel userModel = userModelOptional.get();
-
-            if (userModel.getGeneratedOTP() == 0) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No OTP Found");
-            }
-
-            long timeDifferance = userModel.getTimeStamp() - System.currentTimeMillis();
-            int otpInDB = userModel.getGeneratedOTP();
-
-            if (timeDifferance <= 300000 && otpInDB == otp) {
-                userModel.setGeneratedOTP(0);
-
-                userRepository.save(userModel);
-
-                JwtResponse jwtResponse = generateJWT(userModel, false);
-
-                return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
-            } else if (timeDifferance > 300000) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "OTP Expired");
-            } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong OTP");
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong Phone No");
-        }
-    }
-
-    public JwtResponse generateJWT(UserModel userModel, boolean isNeedToSendOTP) {
-        Set<String> rolesInDB = getRolesStringFromRole(userModel.getRoles());
-
-        if ((rolesInDB.contains("SUPER_ADMIN") || rolesInDB.contains("ADMIN")
-                || rolesInDB.contains("MODERATOR") || rolesInDB.contains("DOCTOR")) && isNeedToSendOTP) {
-            JwtResponse jwtResponse = new JwtResponse(null, null, userModel.getPhoneNo(), rolesInDB);
-            boolean isOTPSent = generateAndSendOTP(userModel.getPhoneNo());
-
-            if (isOTPSent) {
-                return jwtResponse;
-            } else {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There is a problem in OTP sending");
-            }
-        } else {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            userModel.getUsername(),
-                            "00000000"
-                    )
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwtToken = jwtProvider.generateJwtToken(authentication);
-
-            JwtResponse jwtResponse = new JwtResponse(jwtToken, userModel.getName(),
-                    userModel.getPhoneNo(), getRolesStringFromRole(userModel.getRoles()));
-
-            return jwtResponse;
-        }
-
     }
 
     public ResponseEntity<JwtResponse> signIn(@Valid LoginForm loginRequest) {
@@ -209,7 +93,7 @@ public class SignUpAndSignInService {
 
         if (userModelOptional.isPresent()) {
             UserModel userModel = userModelOptional.get();
-            JwtResponse jwtResponse = generateJWT(userModel, true);
+            JwtResponse jwtResponse = otpAndJwtService.generateJWT(userModel, true);
 
             return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
 
@@ -217,29 +101,5 @@ public class SignUpAndSignInService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Exists");
         }
     }
-
-
-    public Set<Role> getRolesFromStringToRole(Set<String> roles2) {
-        Set<Role> roles = new HashSet<>();
-        for (String role : roles2) {
-            Optional<Role> roleOptional = roleRepository.findByName(RoleName.valueOf(role));
-            if (roleOptional.isEmpty()) {
-                throw new ValidationException("Role '" + role + "' does not exist.");
-            }
-            roles.add(roleOptional.get());
-        }
-        return roles;
-    }
-
-    private Set<String> getRolesStringFromRole(Set<Role> roles2) {
-        Set<String> roles = new HashSet<>();
-        for (Role role : roles2) {
-
-            roles.add(role.getName().toString());
-        }
-        return roles;
-    }
-
-
 
 }

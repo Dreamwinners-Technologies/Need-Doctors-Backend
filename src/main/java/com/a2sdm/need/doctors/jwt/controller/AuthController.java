@@ -9,9 +9,9 @@ import com.a2sdm.need.doctors.jwt.dto.request.SignUpForm;
 import com.a2sdm.need.doctors.jwt.dto.response.BasicResponse;
 import com.a2sdm.need.doctors.jwt.dto.response.JwtResponse;
 import com.a2sdm.need.doctors.jwt.dto.response.UserResponse;
+import com.a2sdm.need.doctors.jwt.services.OTPAndJwtService;
 import com.a2sdm.need.doctors.jwt.services.ProfileService;
 import com.a2sdm.need.doctors.jwt.services.SignUpAndSignInService;
-import javassist.bytecode.DuplicateMemberException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +29,7 @@ public class AuthController {
 
     private final SignUpAndSignInService signUpAndSignInService;
     private final ProfileService profileService;
+    private final OTPAndJwtService otpAndJwtService;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
@@ -41,8 +42,8 @@ public class AuthController {
     }
 
     @PostMapping("/verify/otp")
-    public ResponseEntity verifyOTP(@RequestParam String phoneNo, @RequestParam int otp){
-        return signUpAndSignInService.verifyOTP(phoneNo,otp);
+    public ResponseEntity<JwtResponse> verifyOTP(@RequestParam String phoneNo, @RequestParam int otp){
+        return otpAndJwtService.verifyOTP(phoneNo,otp);
     }
 
     @GetMapping("/profile")
