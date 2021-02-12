@@ -1,22 +1,27 @@
 package com.a2sdm.need.doctors.jwt.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.Set;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponse {
-    String username;
-    String email;
-    String firstName;
-    String lastName;
-    String phoneNo;
-    Set<String> role;
+    private String Name;
 
+    private String qualification;
+
+    private String organization;
+
+    private String designation;
+
+    private String phoneNo;
+
+    private String bmdcRegistrationNo;
+
+    private String specialization;
+
+    private String thana;
+
+    private String district;
 }
