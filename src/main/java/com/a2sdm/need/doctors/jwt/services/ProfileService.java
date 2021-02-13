@@ -1,5 +1,6 @@
 package com.a2sdm.need.doctors.jwt.services;
 
+import com.a2sdm.need.doctors.dto.response.MessageIdResponse;
 import com.a2sdm.need.doctors.dto.response.MessageResponse;
 import com.a2sdm.need.doctors.jwt.dto.request.EditProfile;
 import com.a2sdm.need.doctors.jwt.dto.response.UserResponse;
@@ -24,6 +25,7 @@ import java.util.Optional;
 public class ProfileService {
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
+    private final CardInfoRepository cardInfoRepository;
 
     public ResponseEntity<UserResponse> getUserProfile() {
         Object authUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -79,5 +81,19 @@ public class ProfileService {
         else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Went Wrong/ User Not Found");
         }
+    }
+
+    public ResponseEntity<MessageIdResponse> deleteUserId(String phoneNo) {
+        Optional<UserModel> userModelOptional = userRepository.findByPhoneNo(phoneNo);
+
+        if(userModelOptional.isPresent()){
+            UserModel userModel = userModelOptional.get();
+            cardInfoRepository.deleteByAddedBy(userModel.getUsername());
+            userRepository.deleteByPhoneNo(phoneNo);
+
+            return new ResponseEntity<>(new MessageIdResponse("User Deleted", userModel.getId()), HttpStatus.OK);
+        }
+        return null;
+
     }
 }

@@ -61,7 +61,7 @@ public class OTPAndJwtService {
             long timeDifferance = userModel.getTimeStamp() - System.currentTimeMillis();
             int otpInDB = userModel.getGeneratedOTP();
 
-            if (timeDifferance <= 300000 && otpInDB == otp) {
+            if (timeDifferance <= 900000 && otpInDB == otp) {
                 userModel.setGeneratedOTP(0);
 
                 userRepository.save(userModel);
@@ -69,7 +69,7 @@ public class OTPAndJwtService {
                 JwtResponse jwtResponse = generateJWT(userModel, false);
 
                 return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
-            } else if (timeDifferance > 300000) {
+            } else if (timeDifferance > 900000) {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "OTP Expired");
             } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong OTP");
@@ -80,26 +80,14 @@ public class OTPAndJwtService {
     }
 
     public boolean sendOTP(int otp, String sendTo) {
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        String apiUrl = "http://api.greenweb.com.bd/api.php";
-        String smsAccessToken = "5207d3f7af0d432db628fc70c63a1c10";
+        SendSmsService sendSmsService = new SendSmsService();
         String smsText = "Hi, Your Need Doctor's App's OTP is: " + otp + ".\nThanks";
 
-        String finalUrl = apiUrl + "?token=" + smsAccessToken + "&to=" + sendTo + "&message=" + smsText;
+        return sendSmsService.sendSms(smsText, sendTo);
 
-        //http://api.greenweb.com.bd/api.php?token=tokencodehere&to=017xxxxxxxx,015xxxxxxxx&message=my+message+is+here
-
-        ResponseEntity<String> response = restTemplate.getForEntity(finalUrl, String.class);
-
-        System.out.println(response.getStatusCodeValue());
-        System.out.println(response.getStatusCode());
-        System.out.println(response.getBody());
-
-        System.out.println("OTP Sent");
-        return true;
     }
+
+
 
     public JwtResponse generateJWT(UserModel userModel, boolean isNeedToSendOTP) {
         Set<String> rolesInDB = utilServices.getRolesStringFromRole(userModel.getRoles());

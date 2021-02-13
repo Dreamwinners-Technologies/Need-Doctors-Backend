@@ -2,6 +2,7 @@ package com.a2sdm.need.doctors.jwt.controller;
 
 
 
+import com.a2sdm.need.doctors.dto.response.MessageIdResponse;
 import com.a2sdm.need.doctors.dto.response.MessageResponse;
 import com.a2sdm.need.doctors.jwt.dto.request.EditProfile;
 import com.a2sdm.need.doctors.jwt.dto.request.LoginForm;
@@ -60,6 +61,11 @@ public class AuthController {
     @GetMapping("/serverCheck")
     public ResponseEntity<MessageResponse> getServerStatStatus() {
         return new ResponseEntity<>(new MessageResponse("Server is Running"), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/user/delete/{phoneNo}")
+    public ResponseEntity<MessageIdResponse> deleteUser(@PathVariable String phoneNo){
+        return profileService.deleteUserId(phoneNo);
     }
 
 }

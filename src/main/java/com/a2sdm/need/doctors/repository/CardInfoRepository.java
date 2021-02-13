@@ -16,4 +16,6 @@ public interface CardInfoRepository extends JpaRepository<CardModel, String> {
 
     Optional<CardModel> findByAddedBy(String userName);
 
+    boolean deleteByAddedBy(String userName);
+
 }
