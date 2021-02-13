@@ -8,6 +8,7 @@ import com.a2sdm.need.doctors.jwt.model.UserModel;
 import com.a2sdm.need.doctors.jwt.repository.RoleRepository;
 import com.a2sdm.need.doctors.jwt.repository.UserRepository;
 import com.a2sdm.need.doctors.jwt.security.jwt.JwtProvider;
+import com.a2sdm.need.doctors.model.CardModel;
 import com.a2sdm.need.doctors.repository.CardInfoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -83,13 +85,20 @@ public class ProfileService {
         }
     }
 
+    @Transactional
     public ResponseEntity<MessageIdResponse> deleteUserId(String phoneNo) {
         Optional<UserModel> userModelOptional = userRepository.findByPhoneNo(phoneNo);
 
         if(userModelOptional.isPresent()){
             UserModel userModel = userModelOptional.get();
-            cardInfoRepository.deleteByAddedBy(userModel.getUsername());
-            userRepository.deleteByPhoneNo(phoneNo);
+
+            System.out.println(1);
+            userRepository.deleteById(userModel.getId());
+            System.out.println(0);
+//
+//            CardModel cardModel = cardInfoRepository.findByAddedBy(userModel.getUsername()).get();
+//            cardInfoRepository.deleteById(cardModel.getId());
+            System.out.println(2);
 
             return new ResponseEntity<>(new MessageIdResponse("User Deleted", userModel.getId()), HttpStatus.OK);
         }
