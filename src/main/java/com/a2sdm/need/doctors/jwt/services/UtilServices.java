@@ -20,7 +20,7 @@ public class UtilServices {
         Set<Role> roles = new HashSet<>();
         for (String role : roles2) {
             Optional<Role> roleOptional = roleRepository.findByName(RoleName.valueOf(role));
-            if (roleOptional.isEmpty()) {
+            if (!roleOptional.isPresent()) {
                 throw new ValidationException("Role '" + role + "' does not exist.");
             }
             roles.add(roleOptional.get());
