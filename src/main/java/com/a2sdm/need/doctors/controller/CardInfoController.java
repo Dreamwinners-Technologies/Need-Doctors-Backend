@@ -42,22 +42,7 @@ public class CardInfoController {
                                                         @RequestParam(required = false) String thana,
                                                         @RequestParam(required = false) String district
     ) {
-		try{
-	if( name != null && name.isEmpty()) {
-    		name = null;
-	}
-	if( specialization != null && specialization.isEmpty()) {
-    		specialization = null;
-	}
-	if( district != null && district.isEmpty()) {
-    		district = null;
-	}
-        return cardInfoService.getCardList(pageNo, pageSize, name, specialization, thana, district);
-    }
-	}
-	catch(Exception e){
-		System.out.println(e);
-	}
+		
 
     @PutMapping("/edit/{cardId}")
     public ResponseEntity<MessageIdResponse> editCard(@RequestBody CardInfoAddRequest cardInfoAddRequest,
