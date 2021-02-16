@@ -55,6 +55,9 @@ public class CardInfoController {
         return cardInfoService.getCardList(pageNo, pageSize, name, specialization, thana, district);
     }
 	}
+	catch(Exception e){
+		System.out.println(e);
+	}
 
     @PutMapping("/edit/{cardId}")
     public ResponseEntity<MessageIdResponse> editCard(@RequestBody CardInfoAddRequest cardInfoAddRequest,
