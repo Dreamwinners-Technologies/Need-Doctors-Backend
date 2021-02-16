@@ -42,7 +42,9 @@ public class CardInfoController {
                                                         @RequestParam(required = false) String thana,
                                                         @RequestParam(required = false) String district
     ) {
-		
+	
+        return cardInfoService.getCardList(pageNo, pageSize, name, specialization, thana, district);
+    }
 
     @PutMapping("/edit/{cardId}")
     public ResponseEntity<MessageIdResponse> editCard(@RequestBody CardInfoAddRequest cardInfoAddRequest,
