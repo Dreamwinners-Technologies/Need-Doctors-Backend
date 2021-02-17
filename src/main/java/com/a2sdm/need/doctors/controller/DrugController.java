@@ -28,10 +28,31 @@ public class DrugController {
     @GetMapping
     public ResponseEntity<DrugListResponse> getDrugList(@RequestParam(required = false) String name,
                                                         @RequestParam(required = false) String generic,
+                                                        @RequestParam(required = false) String brand,
                                                         @RequestParam(defaultValue = "0") int pageNo,
                                                         @RequestParam(defaultValue = "20") int pageSize){
 
-        return drugService.getDrugList(pageNo, pageSize, name, generic);
+        System.out.println(name);
+        System.out.println(generic);
+
+        if (name != null) {
+            if (name.equals("null") || name.isEmpty()) {
+                name = null;
+            }
+        }
+        if (generic != null) {
+            if (generic.equals("null") || generic.isEmpty()) {
+                generic = null;
+            }
+        }
+
+        if (brand != null) {
+            if (brand.equals("null") || brand.isEmpty()) {
+                brand = null;
+            }
+        }
+
+        return drugService.getDrugList(pageNo, pageSize,brand, name, generic);
     }
 
     @PutMapping("/{drugId}")

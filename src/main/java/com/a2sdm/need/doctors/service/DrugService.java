@@ -37,17 +37,19 @@ public class DrugService {
 
     }
 
-    public ResponseEntity<DrugListResponse> getDrugList(int pageNo, int pageSize, String name, String generic) {
+    public ResponseEntity<DrugListResponse> getDrugList(int pageNo, int pageSize, String name, String generic, String brand) {
         DrugModel exampleDrug = new DrugModel();
         exampleDrug.setName(name);
         exampleDrug.setGeneric(generic);
+        exampleDrug.setBrandName(brand);
 
         Pageable pages = PageRequest.of(pageNo, pageSize, Sort.by("name").ascending());
 
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
                 .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
-                .withMatcher("generic", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+                .withMatcher("generic", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("brand", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
 
         Page<DrugModel> drugModelPages = drugRepository.findAll(Example.of(exampleDrug, matcher), pages);
 
