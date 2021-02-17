@@ -42,7 +42,31 @@ public class CardInfoController {
                                                         @RequestParam(required = false) String thana,
                                                         @RequestParam(required = false) String district
     ) {
-	
+
+        if (name != null) {
+            if (name.equals("null")) {
+                name = null;
+            }
+        }
+        if (specialization != null) {
+            if (specialization.equals("null")) {
+                specialization = null;
+            }
+        }
+
+        if (thana != null) {
+            if (thana.equals("null")) {
+                thana = null;
+            }
+        }
+
+        if (district != null) {
+            if (district.equals("null")) {
+                district = null;
+            }
+        }
+
+
         return cardInfoService.getCardList(pageNo, pageSize, name, specialization, thana, district);
     }
 
