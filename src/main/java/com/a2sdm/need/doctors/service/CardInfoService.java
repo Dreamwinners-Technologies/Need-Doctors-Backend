@@ -98,7 +98,12 @@ public class CardInfoService {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        Page<CardModel> cardModelList = cardInfoRepository.findAll(Example.of(cardExample), pageable);
+        ExampleMatcher matcher = ExampleMatcher
+                .matchingAll()
+                .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
+
+        Page<CardModel> cardModelList = cardInfoRepository.findAll(Example.of(cardExample, matcher), pageable);
 
         CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize,cardModelList.isLast(),
                 cardModelList.getTotalElements(),cardModelList.getTotalPages(),cardModelList.getContent());

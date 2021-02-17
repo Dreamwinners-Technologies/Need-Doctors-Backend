@@ -1,6 +1,7 @@
 package com.a2sdm.need.doctors.controller;
 
 import com.a2sdm.need.doctors.dto.request.CardInfoAddRequest;
+import com.a2sdm.need.doctors.dto.request.CardSearchBangla;
 import com.a2sdm.need.doctors.dto.response.CardListResponse;
 import com.a2sdm.need.doctors.dto.response.MessageIdResponse;
 import com.a2sdm.need.doctors.dto.response.MessageResponse;
@@ -68,6 +69,40 @@ public class CardInfoController {
 
 
         return cardInfoService.getCardList(pageNo, pageSize, name, specialization, thana, district);
+    }
+
+    @PostMapping("/bangla")
+    public ResponseEntity<CardListResponse> getCardListBangla(@RequestParam(defaultValue = "0") int pageNo,
+                                                              @RequestParam(defaultValue = "10") int pageSize,
+                                                              @RequestBody CardSearchBangla cardSearchBangla
+                                                              ) {
+
+        if (cardSearchBangla.name != null) {
+            if (cardSearchBangla.name.equals("null") || cardSearchBangla.name.isEmpty()) {
+                cardSearchBangla.name = null;
+            }
+        }
+        if (cardSearchBangla.specialization != null) {
+            if (cardSearchBangla.specialization.equals("null") || cardSearchBangla.specialization.isEmpty()) {
+                cardSearchBangla.specialization = null;
+            }
+        }
+
+        if (cardSearchBangla.thana != null) {
+            if (cardSearchBangla.thana.equals("null") || cardSearchBangla.thana.isEmpty()) {
+                cardSearchBangla.thana = null;
+            }
+        }
+
+        if (cardSearchBangla.district != null) {
+            if (cardSearchBangla.district.equals("null") || cardSearchBangla.district.isEmpty()) {
+                cardSearchBangla.district = null;
+            }
+        }
+
+
+        return cardInfoService.getCardList(pageNo, pageSize, cardSearchBangla.name,
+                cardSearchBangla.specialization, cardSearchBangla.thana, cardSearchBangla.district);
     }
 
     @PutMapping("/edit/{cardId}")
