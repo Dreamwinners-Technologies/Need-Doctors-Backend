@@ -51,8 +51,11 @@ public class DrugController {
                 brand = null;
             }
         }
+        System.out.println(name);
+        System.out.println(generic);
+        System.out.println(brand);
 
-        return drugService.getDrugList(pageNo, pageSize,brand, name, generic);
+        return drugService.getDrugList(pageNo, pageSize,name, generic, brand);
     }
 
     @PutMapping("/{drugId}")

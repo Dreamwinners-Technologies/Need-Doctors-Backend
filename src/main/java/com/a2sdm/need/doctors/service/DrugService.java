@@ -23,7 +23,7 @@ public class DrugService {
     public ResponseEntity<MessageIdResponse> addDrug(DrugAddRequest drugAddRequest) {
         String drugId = UUID.randomUUID().toString();
 
-        DrugModel drugModel = new DrugModel(drugId, drugAddRequest.getName(), drugAddRequest.getType(), drugAddRequest.getGeneric(),
+        DrugModel drugModel = new DrugModel(drugId, drugAddRequest.getName(), drugAddRequest.getType(), drugAddRequest.getGeneric().toLowerCase(),
                 drugAddRequest.getBrandName(), drugAddRequest.getPackSize(), drugAddRequest.getIndications(),
                 drugAddRequest.getAdultDose(), drugAddRequest.getChildDose(), drugAddRequest.getRenalDose(),
                 drugAddRequest.getAdministration(), drugAddRequest.getContraindications(), drugAddRequest.getSideEffects(),
@@ -38,20 +38,24 @@ public class DrugService {
     }
 
     public ResponseEntity<DrugListResponse> getDrugList(int pageNo, int pageSize, String name, String generic, String brand) {
-        DrugModel exampleDrug = new DrugModel();
-        exampleDrug.setName(name);
-        exampleDrug.setGeneric(generic);
-        exampleDrug.setBrandName(brand);
+        DrugModel exampleDrug = DrugModel
+                .builder()
+                .name(name)
+                .generic(generic)
+                .brandName(brand)
+                .build();
+
 
         Pageable pages = PageRequest.of(pageNo, pageSize, Sort.by("name").ascending());
 
         ExampleMatcher matcher = ExampleMatcher
                 .matchingAll()
+                .withIgnoreNullValues()
                 .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                 .withMatcher("generic", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                 .withMatcher("brand", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
 
-        Page<DrugModel> drugModelPages = drugRepository.findAll(Example.of(exampleDrug, matcher), pages);
+        Page<DrugModel> drugModelPages = drugRepository.findAll(Example.of(exampleDrug,matcher),pages);
 
         List<DrugModel> drugModelList = new ArrayList<>();
         for (DrugModel drugModel : drugModelPages) {
@@ -62,6 +66,7 @@ public class DrugService {
                 drugModelPages.getTotalElements(), drugModelPages.getTotalPages(), drugModelList);
 
         return new ResponseEntity<>(drugListResponse, HttpStatus.OK);
+//        return null;
 
     }
 
