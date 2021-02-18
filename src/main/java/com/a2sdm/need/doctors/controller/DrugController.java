@@ -79,9 +79,9 @@ public class DrugController {
     @GetMapping("/generic")
     public ResponseEntity<Set<String>> getDrugListByGeneric(@RequestParam(required = false) String genericName){
         
-        if (generic != null) {
-            if (generic.equals("null") || generic.isEmpty()) {
-                generic = null;
+        if (genericName != null) {
+            if (genericName.equals("null") || genericName.isEmpty()) {
+                genericName = null;
             }
         }
         
