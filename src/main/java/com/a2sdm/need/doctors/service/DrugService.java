@@ -55,7 +55,7 @@ public class DrugService {
                 .withMatcher("generic", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                 .withMatcher("brand", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
 
-        Page<DrugModel> drugModelPages = drugRepository.findAll(Example.of(exampleDrug,matcher),pages);
+        Page<DrugModel> drugModelPages = drugRepository.findAll(Example.of(exampleDrug, matcher), pages);
 
         List<DrugModel> drugModelList = new ArrayList<>();
         for (DrugModel drugModel : drugModelPages) {

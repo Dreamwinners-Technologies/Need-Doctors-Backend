@@ -2,6 +2,7 @@ package com.a2sdm.need.doctors.model;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -30,30 +31,43 @@ public class DrugModel {
 
     private String packSize;
 
+    @Column(columnDefinition="TEXT")
     private String indications;
 
+    @Column(columnDefinition="TEXT")
     private String adultDose;
 
+    @Column(columnDefinition="TEXT")
     private String childDose;
 
+    @Column(columnDefinition="TEXT")
     private String renalDose;
 
+    @Column(columnDefinition="TEXT")
     private String administration;
 
+    @Column(columnDefinition="TEXT")
     private String contraindications;
 
+    @Column(columnDefinition="TEXT")
     private String sideEffects;
 
+    @Column(columnDefinition="TEXT")
     private String precautionsAndWarnings;
 
+    @Column(columnDefinition="TEXT")
     private String pregnancyAndLactation;
 
+    @Column(columnDefinition="TEXT")
     private String therapeuticClass;
 
+    @Column(columnDefinition="TEXT")
     private String modeOfAction;
 
+    @Column(columnDefinition="TEXT")
     private String interaction;
 
+    @Column(columnDefinition="TEXT")
     private String packSizeAndPrice;
 
     public DrugModel(String name, String type, String generic, String brandName, String packSize, String indications, String adultDose, String childDose, String renalDose, String administration, String contraindications, String sideEffects, String precautionsAndWarnings, String pregnancyAndLactation, String therapeuticClass, String modeOfAction, String interaction, String packSizeAndPrice) {
