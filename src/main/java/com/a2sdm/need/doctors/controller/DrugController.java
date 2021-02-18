@@ -76,7 +76,7 @@ public class DrugController {
         return drugService.getDrugInfo(drugId);
     }
 
-    @GetMapping("/generic/{genericName}")
+    @GetMapping("/generic")
     public ResponseEntity<Set<String>> getDrugListByGeneric(@RequestParam(required = false) String genericName){
         
         if (generic != null) {
