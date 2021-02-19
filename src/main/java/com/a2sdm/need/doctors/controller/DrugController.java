@@ -76,9 +76,15 @@ public class DrugController {
         return drugService.getDrugInfo(drugId);
     }
 
-    @GetMapping("/generic/{genericName}")
-    public ResponseEntity<Set<String>> getDrugListByGeneric(@PathVariable String genericName){
-
+    @GetMapping("/generic")
+    public ResponseEntity<Set<String>> getDrugListByGeneric(@RequestParam(required = false) String genericName){
+        
+        if (genericName != null) {
+            if (genericName.equals("null") || genericName.isEmpty()) {
+                genericName = null;
+            }
+        }
+        
         return drugService.getDrugListByGeneric(genericName);
     }
 }
