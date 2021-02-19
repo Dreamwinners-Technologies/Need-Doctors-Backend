@@ -83,6 +83,7 @@ public class JwtProvider {
     }
 
     public String getRolesFromJwtToken(String token) {
+        token = token.split("\\s+")[1];
         return Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
