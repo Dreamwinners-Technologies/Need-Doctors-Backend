@@ -31,8 +31,15 @@ public class AdminPanelService {
 
             Set<Role> roles = userModel.getRoles();
 
+
+
             Set<String> rolesString;
             rolesString = utilServices.getRolesStringFromRole(roles);
+
+            if(rolesString.contains("DOCTOR")){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't set Moderator permission to a doctor. Create new account with other Roles");
+            }
+
             rolesString.add("MODERATOR");
 
             userModel.setRoles(utilServices.getRolesFromStringToRole(rolesString));

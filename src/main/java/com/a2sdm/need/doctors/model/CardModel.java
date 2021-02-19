@@ -2,6 +2,7 @@ package com.a2sdm.need.doctors.model;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -34,4 +35,7 @@ public class CardModel {
     private String district;
 
     private String cardImageUrl;
+
+    @Column(columnDefinition="TEXT")
+    private String cardOcrData;
 }

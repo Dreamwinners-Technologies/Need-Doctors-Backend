@@ -23,7 +23,7 @@ public class OwnCardService {
 
 
     public ResponseEntity<MessageIdResponse> editOwnVisitingCard(String token, CardInfoAddRequest cardInfoAddRequest) {
-        String userName = jwtProvider.getUserNameFromJwtToken(token);
+        String userName = jwtProvider.getUserNameFromJwtToken1(token);
 
         Optional<CardModel> cardModelOptional = cardInfoRepository.findByAddedBy(userName);
 
@@ -47,7 +47,7 @@ public class OwnCardService {
     }
 
     public ResponseEntity<CardModel> getOwnCard(String token) {
-        String userName = jwtProvider.getUserNameFromJwtToken(token);
+        String userName = jwtProvider.getUserNameFromJwtToken1(token);
 
         Optional<CardModel> cardModelOptional = cardInfoRepository.findByAddedBy(userName);
 

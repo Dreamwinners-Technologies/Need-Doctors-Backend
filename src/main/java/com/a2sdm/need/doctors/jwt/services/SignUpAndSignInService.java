@@ -60,7 +60,7 @@ public class SignUpAndSignInService {
     private void saveCard(SignUpForm signUpRequest) {
         CardModel cardModel = new CardModel(UUID.randomUUID().toString(), "u" + signUpRequest.getPhoneNo(),
                 signUpRequest.getName(), "xxxxxxxxxxx", signUpRequest.getSpecialization(), signUpRequest.getThana(),
-                signUpRequest.getDistrict(), "");
+                signUpRequest.getDistrict(), "", "");
 
         cardInfoRepository.save(cardModel);
     }

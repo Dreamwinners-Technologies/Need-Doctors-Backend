@@ -29,42 +29,36 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final CardInfoRepository cardInfoRepository;
 
-    public ResponseEntity<UserResponse> getUserProfile() {
-        Object authUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<UserResponse> getUserProfile(String token) {
+        System.out.println(token);
+        String userName = jwtProvider.getUserNameFromJwtToken1(token);
 
-        if (authUser instanceof UserDetails) {
-            String username = ((UserDetails) authUser).getUsername();
+        Optional<UserModel> userModelOptional = userRepository.findByUsername(userName);
 
-            Optional<UserModel> userOptional = userRepository.findByUsername(username);
+        if (userModelOptional.isPresent()) {
 
-            if (userOptional.isPresent()) {
-                UserModel user = userOptional.get();
+            UserModel user = userModelOptional.get();
 
-                UserResponse userResponse = new UserResponse(user.getName(), user.getQualification(),
-                        user.getOrganization(), user.getDesignation(), user.getPhoneNo(),
-                        user.getBmdcRegistrationNo(), user.getSpecialization(), user.getThana(), user.getDistrict()
+            UserResponse userResponse = new UserResponse(user.getName(), user.getQualification(),
+                    user.getOrganization(), user.getDesignation(), user.getPhoneNo(),
+                    user.getBmdcRegistrationNo(), user.getSpecialization(), user.getThana(), user.getDistrict()
 
-                );
+            );
 
-                return new ResponseEntity<>(userResponse, HttpStatus.OK);
-
-            } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User Not Found");
-            }
-        }
-        else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"There's a problem in JWT Token");
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There's a problem in JWT Token");
         }
 
     }
 
 
     public ResponseEntity<MessageResponse> editUserProfile(String token, EditProfile editProfile) {
-        String userName = jwtProvider.getUserNameFromJwtToken(token);
+        String userName = jwtProvider.getUserNameFromJwtToken1(token);
 
         Optional<UserModel> userModelOptional = userRepository.findByUsername(userName);
 
-        if(userModelOptional.isPresent()){
+        if (userModelOptional.isPresent()) {
             UserModel userModel = userModelOptional.get();
 
             userModel.setName(editProfile.getName());
@@ -78,9 +72,8 @@ public class ProfileService {
 
             userRepository.save(userModel);
 
-            return new ResponseEntity<>(new MessageResponse("Profile Edit Successful"),HttpStatus.OK);
-        }
-        else {
+            return new ResponseEntity<>(new MessageResponse("Profile Edit Successful"), HttpStatus.OK);
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Went Wrong/ User Not Found");
         }
     }
@@ -89,7 +82,7 @@ public class ProfileService {
     public ResponseEntity<MessageIdResponse> deleteUserId(String phoneNo) {
         Optional<UserModel> userModelOptional = userRepository.findByPhoneNo(phoneNo);
 
-        if(userModelOptional.isPresent()){
+        if (userModelOptional.isPresent()) {
             UserModel userModel = userModelOptional.get();
 
             System.out.println(1);

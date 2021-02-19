@@ -37,11 +37,17 @@ public class CardInfoService {
 
         String randomId = UUID.randomUUID().toString();
 
-        String addedBy = jwtProvider.getUserNameFromJwtToken(token);
+        String addedBy = jwtProvider.getUserNameFromJwtToken1(token);
+
+        String roles = jwtProvider.getRolesFromJwtToken(token);
+
+        if(roles.contains("DOCTOR")){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't add more than one card");
+        }
 
         CardModel cardModel = new CardModel(
                 randomId, addedBy, cardInfoRequest.getName(), cardInfoRequest.getAppointmentNo(),
-                cardInfoRequest.getSpecialization(), cardInfoRequest.getThana(), cardInfoRequest.getDistrict(), "");
+                cardInfoRequest.getSpecialization(), cardInfoRequest.getThana(), cardInfoRequest.getDistrict(), "",cardInfoRequest.getCardOcrData());
 
         cardInfoRepository.save(cardModel);
 

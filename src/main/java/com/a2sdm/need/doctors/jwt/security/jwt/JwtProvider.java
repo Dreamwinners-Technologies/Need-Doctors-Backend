@@ -67,8 +67,15 @@ public class JwtProvider {
         return false;
     }
 
-    public String getUserNameFromJwtToken(String token) {
+    public String getUserNameFromJwtToken1(String token) {
         token = token.split("\\s+")[1];
+        return Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody().getSubject();
+    }
+
+    public String getUserNameFromJwtToken(String token) {
         return Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)

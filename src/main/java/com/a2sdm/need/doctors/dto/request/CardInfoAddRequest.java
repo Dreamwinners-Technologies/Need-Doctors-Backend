@@ -17,4 +17,6 @@ public class CardInfoAddRequest {
     private String thana;
 
     private String district;
+
+    private String cardOcrData;
 }

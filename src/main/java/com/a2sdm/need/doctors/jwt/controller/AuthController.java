@@ -48,8 +48,8 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserResponse> getLoggedProfileInfo() {
-        return profileService.getUserProfile();
+    public ResponseEntity<UserResponse> getLoggedProfileInfo(@RequestHeader(name = "Authorization") String token) {
+        return profileService.getUserProfile(token);
     }
 
     @PutMapping("/profile/edit")

@@ -20,4 +20,6 @@ public class CardInfoResponse {
     private String district;
 
     private String cardImageUrl;
+
+    private String cardOcrData;
 }
