@@ -45,7 +45,6 @@ public class DrugService {
                 .brandName(brand)
                 .build();
 
-
         Pageable pages = PageRequest.of(pageNo, pageSize, Sort.by("name").ascending());
 
         ExampleMatcher matcher = ExampleMatcher

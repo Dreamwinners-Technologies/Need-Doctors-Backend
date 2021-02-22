@@ -45,9 +45,17 @@ public class CardInfoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't add more than one card");
         }
 
+        StringBuilder specializations = new StringBuilder();
+
+        for (String sp:cardInfoRequest.getSpecializations()){
+            specializations.append(sp).append("\n");
+        }
+
+
         CardModel cardModel = new CardModel(
                 randomId, addedBy, cardInfoRequest.getName(), cardInfoRequest.getAppointmentNo(),
-                cardInfoRequest.getSpecialization(), cardInfoRequest.getThana(), cardInfoRequest.getDistrict(), "",cardInfoRequest.getCardOcrData());
+                specializations.toString(), cardInfoRequest.getThana(), cardInfoRequest.getDistrict(),
+                "",cardInfoRequest.getCardOcrData());
 
         cardInfoRepository.save(cardModel);
 
@@ -101,6 +109,41 @@ public class CardInfoService {
                 .thana(thana)
                 .district(district)
                 .build();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        ExampleMatcher matcher = ExampleMatcher
+                .matchingAll()
+                .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("specialization", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("thana", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("district", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
+
+        Page<CardModel> cardModelList = cardInfoRepository.findAll(Example.of(cardExample, matcher), pageable);
+
+        CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize,cardModelList.isLast(),
+                cardModelList.getTotalElements(),cardModelList.getTotalPages(),cardModelList.getContent());
+
+        return new ResponseEntity<>(cardListResponse, HttpStatus.OK);
+
+    }
+
+    public ResponseEntity<CardListResponse> getCardList2(int pageNo, int pageSize, String name, String specialization, String thana, String district, List<String> specializations) {
+
+
+        CardModel cardExample = CardModel
+                .builder()
+                .name(name)
+                .specialization(specialization)
+                .thana(thana)
+                .district(district)
+                .build();
+
+        for (String a:specializations){
+            System.out.println(a);
+        }
+        System.out.println(specializations.get(0));
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 

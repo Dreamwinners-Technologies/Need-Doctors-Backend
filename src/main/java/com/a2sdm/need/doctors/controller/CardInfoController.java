@@ -101,8 +101,8 @@ public class CardInfoController {
         }
 
 
-        return cardInfoService.getCardList(pageNo, pageSize, cardSearchBangla.name,
-                cardSearchBangla.specialization, cardSearchBangla.thana, cardSearchBangla.district);
+        return cardInfoService.getCardList2(pageNo, pageSize, cardSearchBangla.name,
+                cardSearchBangla.specialization, cardSearchBangla.thana, cardSearchBangla.district, cardSearchBangla.getSpecializations());
     }
 
     @PutMapping("/edit/{cardId}")

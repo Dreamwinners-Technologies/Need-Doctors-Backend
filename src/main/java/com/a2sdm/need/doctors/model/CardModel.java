@@ -2,11 +2,10 @@ package com.a2sdm.need.doctors.model;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -38,4 +37,5 @@ public class CardModel {
 
     @Column(columnDefinition="TEXT")
     private String cardOcrData;
+
 }

@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -32,6 +33,8 @@ public class SignUpForm {
     private String district;
 
     private String thana;
+
+    private List<String> specializations;
 
 
 

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -57,9 +59,18 @@ public class SignUpAndSignInService {
         }
     }
 
+
+
     private void saveCard(SignUpForm signUpRequest) {
+
+        StringBuilder specializations = new StringBuilder();
+
+        for (String sp:signUpRequest.getSpecializations()){
+            specializations.append(sp).append("\n");
+        }
+
         CardModel cardModel = new CardModel(UUID.randomUUID().toString(), "u" + signUpRequest.getPhoneNo(),
-                signUpRequest.getName(), "xxxxxxxxxxx", signUpRequest.getSpecialization(), signUpRequest.getThana(),
+                signUpRequest.getName(), "xxxxxxxxxxx", specializations.toString(), signUpRequest.getThana(),
                 signUpRequest.getDistrict(), "", "");
 
         cardInfoRepository.save(cardModel);
