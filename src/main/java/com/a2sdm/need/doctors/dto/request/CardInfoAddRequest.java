@@ -19,8 +19,6 @@ public class CardInfoAddRequest {
     @Size(min = 11, max = 11)
     private String appointmentNo;
 
-    private String specialization;
-
     private String thana;
 
     private String district;

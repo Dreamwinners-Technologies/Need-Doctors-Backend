@@ -28,10 +28,17 @@ public class OwnCardService {
         Optional<CardModel> cardModelOptional = cardInfoRepository.findByAddedBy(userName);
 
         if(cardModelOptional.isPresent()){
+
+            StringBuilder specializations = new StringBuilder();
+
+            for (String sp:cardInfoAddRequest.getSpecializations()){
+                specializations.append(sp).append("\n");
+            }
+
             CardModel cardModel = cardModelOptional.get();
 
             cardModel.setName(cardInfoAddRequest.getName());
-            cardModel.setSpecialization(cardInfoAddRequest.getSpecialization());
+            cardModel.setSpecialization(specializations.toString());
             cardModel.setAppointmentNo(cardInfoAddRequest.getAppointmentNo());
             cardModel.setThana(cardInfoAddRequest.getThana());
             cardModel.setDistrict(cardInfoAddRequest.getDistrict());

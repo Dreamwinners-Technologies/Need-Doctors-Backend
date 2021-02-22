@@ -165,11 +165,17 @@ public class CardInfoService {
         Optional<CardModel> cardModelOptional = cardInfoRepository.findById(cardId);
 
         if(cardModelOptional.isPresent()){
+            StringBuilder specializations = new StringBuilder();
+
+            for (String sp:cardInfoAddRequest.getSpecializations()){
+                specializations.append(sp).append("\n");
+            }
+
             CardModel cardModel = cardModelOptional.get();
 
             cardModel.setName(cardInfoAddRequest.getName());
             cardModel.setAppointmentNo(cardInfoAddRequest.getAppointmentNo());
-            cardModel.setSpecialization(cardInfoAddRequest.getSpecialization());
+            cardModel.setSpecialization(specializations.toString());
             cardModel.setThana(cardInfoAddRequest.getThana());
             cardModel.setDistrict(cardInfoAddRequest.getDistrict());
 
