@@ -10,6 +10,7 @@ import com.a2sdm.need.doctors.jwt.repository.UserRepository;
 import com.a2sdm.need.doctors.jwt.security.jwt.JwtProvider;
 import com.a2sdm.need.doctors.model.CardModel;
 import com.a2sdm.need.doctors.repository.CardInfoRepository;
+import com.a2sdm.need.doctors.service.CardInfoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,15 +60,13 @@ public class SignUpAndSignInService {
         }
     }
 
-
+    private final CardInfoService cardInfoService;
 
     private void saveCard(SignUpForm signUpRequest) {
 
-        StringBuilder specializations = new StringBuilder();
 
-        for (String sp:signUpRequest.getSpecializations()){
-            specializations.append(sp).append("\n");
-        }
+
+        StringBuilder specializations = cardInfoService.getStringFromList(signUpRequest.getSpecializations());
 
         CardModel cardModel = new CardModel(UUID.randomUUID().toString(), "u" + signUpRequest.getPhoneNo(),
                 signUpRequest.getName(), "xxxxxxxxxxx", specializations.toString(), signUpRequest.getThana(),

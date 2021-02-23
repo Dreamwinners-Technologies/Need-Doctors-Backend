@@ -20,6 +20,7 @@ import java.util.Optional;
 public class OwnCardService {
     private final CardInfoRepository cardInfoRepository;
     private final JwtProvider jwtProvider;
+    private final CardInfoService cardInfoService;
 
 
     public ResponseEntity<MessageIdResponse> editOwnVisitingCard(String token, CardInfoAddRequest cardInfoAddRequest) {
@@ -29,11 +30,7 @@ public class OwnCardService {
 
         if(cardModelOptional.isPresent()){
 
-            StringBuilder specializations = new StringBuilder();
-
-            for (String sp:cardInfoAddRequest.getSpecializations()){
-                specializations.append(sp).append("\n");
-            }
+            StringBuilder specializations = cardInfoService.getStringFromList(cardInfoAddRequest.getSpecializations());
 
             CardModel cardModel = cardModelOptional.get();
 

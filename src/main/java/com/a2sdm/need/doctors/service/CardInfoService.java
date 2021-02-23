@@ -41,21 +41,17 @@ public class CardInfoService {
 
         String roles = jwtProvider.getRolesFromJwtToken(token);
 
-        if(roles.contains("DOCTOR")){
+        if (roles.contains("DOCTOR")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't add more than one card");
         }
 
-        StringBuilder specializations = new StringBuilder();
-
-        for (String sp:cardInfoRequest.getSpecializations()){
-            specializations.append(sp).append("\n");
-        }
+        StringBuilder specializations = getStringFromList(cardInfoRequest.getSpecializations());
 
 
         CardModel cardModel = new CardModel(
                 randomId, addedBy, cardInfoRequest.getName(), cardInfoRequest.getAppointmentNo(),
                 specializations.toString(), cardInfoRequest.getThana(), cardInfoRequest.getDistrict(),
-                "",cardInfoRequest.getCardOcrData());
+                "", cardInfoRequest.getCardOcrData());
 
         cardInfoRepository.save(cardModel);
 
@@ -122,8 +118,8 @@ public class CardInfoService {
 
         Page<CardModel> cardModelList = cardInfoRepository.findAll(Example.of(cardExample, matcher), pageable);
 
-        CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize,cardModelList.isLast(),
-                cardModelList.getTotalElements(),cardModelList.getTotalPages(),cardModelList.getContent());
+        CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize, cardModelList.isLast(),
+                cardModelList.getTotalElements(), cardModelList.getTotalPages(), cardModelList.getContent());
 
         return new ResponseEntity<>(cardListResponse, HttpStatus.OK);
 
@@ -140,11 +136,6 @@ public class CardInfoService {
                 .district(district)
                 .build();
 
-        for (String a:specializations){
-            System.out.println(a);
-        }
-        System.out.println(specializations.get(0));
-
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         ExampleMatcher matcher = ExampleMatcher
@@ -154,8 +145,8 @@ public class CardInfoService {
 
         Page<CardModel> cardModelList = cardInfoRepository.findAll(Example.of(cardExample, matcher), pageable);
 
-        CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize,cardModelList.isLast(),
-                cardModelList.getTotalElements(),cardModelList.getTotalPages(),cardModelList.getContent());
+        CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize, cardModelList.isLast(),
+                cardModelList.getTotalElements(), cardModelList.getTotalPages(), cardModelList.getContent());
 
         return new ResponseEntity<>(cardListResponse, HttpStatus.OK);
 
@@ -164,12 +155,8 @@ public class CardInfoService {
     public ResponseEntity<MessageIdResponse> editCardInfo(CardInfoAddRequest cardInfoAddRequest, String cardId) {
         Optional<CardModel> cardModelOptional = cardInfoRepository.findById(cardId);
 
-        if(cardModelOptional.isPresent()){
-            StringBuilder specializations = new StringBuilder();
-
-            for (String sp:cardInfoAddRequest.getSpecializations()){
-                specializations.append(sp).append("\n");
-            }
+        if (cardModelOptional.isPresent()) {
+            StringBuilder specializations = getStringFromList(cardInfoAddRequest.getSpecializations());
 
             CardModel cardModel = cardModelOptional.get();
 
@@ -181,22 +168,37 @@ public class CardInfoService {
 
             cardInfoRepository.save(cardModel);
 
-            return new ResponseEntity<>(new MessageIdResponse("Edit Successful",cardId),HttpStatus.OK);
-        }
-        else {
+            return new ResponseEntity<>(new MessageIdResponse("Edit Successful", cardId), HttpStatus.OK);
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong/ Card Not Found");
         }
+    }
+
+    public StringBuilder getStringFromList(List<String> sp) {
+        StringBuilder specializations = new StringBuilder();
+
+
+        for (int i = 0; i < sp.size(); i++) {
+            if (i == (sp.size() - 1)) {
+                specializations.append(sp.get(i));
+            }
+            else {
+                specializations.append(sp.get(i)).append('\n');
+            }
+
+
+        }
+        return specializations;
     }
 
     public ResponseEntity<MessageIdResponse> deleteCardInfo(String cardId) {
         Optional<CardModel> cardModelOptional = cardInfoRepository.findById(cardId);
 
-        if(cardModelOptional.isPresent()){
+        if (cardModelOptional.isPresent()) {
             cardInfoRepository.deleteById(cardId);
 
-            return new ResponseEntity<>(new MessageIdResponse("Card Deleted Successful", cardId),HttpStatus.OK);
-        }
-        else {
+            return new ResponseEntity<>(new MessageIdResponse("Card Deleted Successful", cardId), HttpStatus.OK);
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong/ Card Not Found");
         }
     }
