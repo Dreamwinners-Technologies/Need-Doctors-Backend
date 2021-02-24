@@ -18,4 +18,8 @@ public interface CardInfoRepository extends JpaRepository<CardModel, String> {
 
     boolean deleteByAddedBy(String userName);
 
+    boolean existsByAppointmentNo(String appointmentNo);
+
+    boolean existsByName(String name);
+
 }

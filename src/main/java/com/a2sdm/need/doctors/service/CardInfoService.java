@@ -35,6 +35,10 @@ public class CardInfoService {
 
     public ResponseEntity<MessageIdResponse> addCardInfo(CardInfoAddRequest cardInfoRequest, String token) {
 
+        if(cardInfoRepository.existsByName(cardInfoRequest.getName()) && cardInfoRepository.existsByAppointmentNo(cardInfoRequest.getAppointmentNo())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card Already Exits");
+        }
+
         String randomId = UUID.randomUUID().toString();
 
         String addedBy = jwtProvider.getUserNameFromJwtToken1(token);
