@@ -9,6 +9,8 @@ import com.a2sdm.need.doctors.jwt.model.UserModel;
 import com.a2sdm.need.doctors.jwt.security.jwt.JwtProvider;
 import com.a2sdm.need.doctors.model.CardModel;
 import com.a2sdm.need.doctors.repository.CardInfoRepository;
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.*;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import liquibase.pro.packaged.O;
@@ -67,7 +69,7 @@ public class CardInfoService {
 
         if (cardModelOptional.isPresent()) {
             CardModel cardModel = cardModelOptional.get();
-            String imageUrl = uploadFile(aFile);
+            String imageUrl = uploadFileAzure(aFile);
             cardModel.setCardImageUrl(imageUrl);
 
             cardInfoRepository.save(cardModel);
@@ -95,6 +97,26 @@ public class CardInfoService {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File Upload Failed");
         }
+
+    }
+
+    private final BlobClientBuilder client;
+
+    private String uploadFileAzure(MultipartFile file) throws IOException {
+
+        if(file != null && file.getSize() > 0) {
+            try {
+                //implement your own file name logic.
+                String fileName = "need-doctors-"+ UUID.randomUUID().toString().substring(0, 9) +file.getOriginalFilename();
+                client.blobName(fileName).buildClient().upload(file.getInputStream(),file.getSize());
+
+                System.out.println(fileName);
+                return "https://needdoctors.blob.core.windows.net/doctor-cards/"+fileName;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
 
     }
 

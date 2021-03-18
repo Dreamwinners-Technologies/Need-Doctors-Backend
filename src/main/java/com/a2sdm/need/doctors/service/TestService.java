@@ -1,5 +1,8 @@
 package com.a2sdm.need.doctors.service;
 
+import com.a2sdm.need.doctors.model.test.Insert;
+import com.a2sdm.need.doctors.model.test.TestResponse;
+import com.a2sdm.need.doctors.repository.DrugRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,12 +11,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Objects;
+
 @AllArgsConstructor
 
 @Service
 public class TestService {
+    private final DrugRepository drugRepository;
 
-    public ResponseEntity getData() {
+    public Insert getData() {
         RestTemplate restTemplate = new RestTemplate();
 
         String url = "http://dims.itmapi.com/api/generic?page=2";
@@ -29,11 +35,15 @@ public class TestService {
 //        ResponseEntity response
 //                = restTemplate.postForEntity(url,new org.json., String.class);
 
-        ResponseEntity response
-                = restTemplate.postForEntity(url, entity, String.class );
+        ResponseEntity<TestResponse> response
+                = restTemplate.postForEntity(url, entity, TestResponse.class );
 
-        System.out.println(response.getBody());
+        System.out.println(Objects.requireNonNull(response.getBody()).getInsert().getMeta().getPagination().total);
 
-        return response;
+        return response.getBody().getInsert();
     }
+
+//    public String saveData(Insert inset){
+//
+//    }
 }
