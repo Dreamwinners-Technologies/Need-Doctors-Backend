@@ -191,6 +191,7 @@ public class CardInfoService {
             cardModel.setSpecialization(specializations.toString());
             cardModel.setThana(cardInfoAddRequest.getThana());
             cardModel.setDistrict(cardInfoAddRequest.getDistrict());
+            cardModel.setCardOcrData(cardInfoAddRequest.getCardOcrData());
 
             cardInfoRepository.save(cardModel);
 
