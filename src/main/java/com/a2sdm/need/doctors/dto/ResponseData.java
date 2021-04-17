@@ -1,4 +1,4 @@
-package com.a2sdm.need.doctors.model.test;
+package com.a2sdm.need.doctors.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class Datum{
+public class ResponseData {
 
     public int generic_id;
 
