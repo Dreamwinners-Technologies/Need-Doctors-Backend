@@ -3,6 +3,7 @@ package com.a2sdm.need.doctors.controller;
 import com.a2sdm.need.doctors.dto.request.CardInfoAddRequest;
 import com.a2sdm.need.doctors.dto.request.CardSearchBangla;
 import com.a2sdm.need.doctors.dto.response.CardListResponse;
+import com.a2sdm.need.doctors.dto.response.CardListResponseV2;
 import com.a2sdm.need.doctors.dto.response.MessageIdResponse;
 import com.a2sdm.need.doctors.dto.response.MessageResponse;
 import com.a2sdm.need.doctors.service.CardInfoService;
@@ -36,12 +37,12 @@ public class CardInfoController {
     }
 
     @GetMapping
-    public ResponseEntity<CardListResponse> getCardList(@RequestParam(defaultValue = "0") int pageNo,
-                                                        @RequestParam(defaultValue = "10") int pageSize,
-                                                        @RequestParam(required = false) String name,
-                                                        @RequestParam(required = false) String specialization,
-                                                        @RequestParam(required = false) String thana,
-                                                        @RequestParam(required = false) String district
+    public ResponseEntity<CardListResponseV2> getCardList(@RequestParam(defaultValue = "0") int pageNo,
+                                                          @RequestParam(defaultValue = "10") int pageSize,
+                                                          @RequestParam(required = false) String name,
+                                                          @RequestParam(required = false) String specialization,
+                                                          @RequestParam(required = false) String thana,
+                                                          @RequestParam(required = false) String district
     ) {
 
         if (name != null) {
@@ -69,13 +70,14 @@ public class CardInfoController {
 
 
         return cardInfoService.getCardList(pageNo, pageSize, name, specialization, thana, district);
+
     }
 
     @PostMapping("/bangla")
     public ResponseEntity<CardListResponse> getCardListBangla(@RequestParam(defaultValue = "0") int pageNo,
                                                               @RequestParam(defaultValue = "10") int pageSize,
                                                               @RequestBody CardSearchBangla cardSearchBangla
-                                                              ) {
+    ) {
 
         if (cardSearchBangla.name != null) {
             if (cardSearchBangla.name.equals("null") || cardSearchBangla.name.isEmpty()) {

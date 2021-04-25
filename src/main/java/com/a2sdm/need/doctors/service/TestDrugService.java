@@ -58,11 +58,12 @@ public class TestDrugService {
             TestCompanyNameModel testCompanyNameModel = testMedicineModel.getTestCompanyNameModel();
             DrugModel drugModel = new DrugModel(testMedicineModel.getMedicineId(), testMedicineModel.getBrandName(),
                     testMedicineModel.getForm(), testGenericModel.getGenericName(), testCompanyNameModel.getCompanyName(),
-                    testMedicineModel.getPrice(), testGenericModel.getIndication(), testGenericModel.getAdultDose(),
+                    testMedicineModel.getStrength(), testGenericModel.getIndication(), testGenericModel.getAdultDose(),
                     testGenericModel.getChildDose(), testGenericModel.getRenalDose(), testGenericModel.getAdministration(),
                     testGenericModel.getContraIndication(), testGenericModel.getSideEffect(), testGenericModel.getPrecaution(),
                     testGenericModel.getPregnancyCategoryNote(), "",testGenericModel.getModeOfAction(),
-                    testGenericModel.getInteraction(), testMedicineModel.getPackedSize());
+                    testGenericModel.getInteraction(),
+                    "Pack Size: "+testMedicineModel.getPackedSize()+"\nUnitPrice: "+testMedicineModel.getPrice()+" BDT");
 
             drugModelList.add(drugModel);
         }

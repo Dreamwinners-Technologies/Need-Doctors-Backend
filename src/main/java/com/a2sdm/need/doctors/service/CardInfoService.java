@@ -1,10 +1,7 @@
 package com.a2sdm.need.doctors.service;
 
 import com.a2sdm.need.doctors.dto.request.CardInfoAddRequest;
-import com.a2sdm.need.doctors.dto.response.CardInfoResponse;
-import com.a2sdm.need.doctors.dto.response.CardListResponse;
-import com.a2sdm.need.doctors.dto.response.MessageIdResponse;
-import com.a2sdm.need.doctors.dto.response.MessageResponse;
+import com.a2sdm.need.doctors.dto.response.*;
 import com.a2sdm.need.doctors.jwt.model.UserModel;
 import com.a2sdm.need.doctors.jwt.security.jwt.JwtProvider;
 import com.a2sdm.need.doctors.model.CardModel;
@@ -121,7 +118,7 @@ public class CardInfoService {
     }
 
 
-    public ResponseEntity<CardListResponse> getCardList(int pageNo, int pageSize, String name, String specialization, String thana, String district) {
+    public ResponseEntity<CardListResponseV2> getCardList(int pageNo, int pageSize, String name, String specialization, String thana, String district) {
 
 
         CardModel cardExample = CardModel
@@ -144,8 +141,23 @@ public class CardInfoService {
 
         Page<CardModel> cardModelList = cardInfoRepository.findAll(Example.of(cardExample, matcher), pageable);
 
-        CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize, cardModelList.isLast(),
-                cardModelList.getTotalElements(), cardModelList.getTotalPages(), cardModelList.getContent());
+        List<CardInfoResponseV2> cardInfoResponseList = new ArrayList<>();
+
+        for (CardModel cardModel: cardModelList.getContent()){
+            List<String> specializations = Arrays.asList(cardModel.getSpecialization().split(","));
+
+            CardInfoResponseV2 cardInfoResponseV2 = new CardInfoResponseV2(cardModel.getId(), cardModel.getAddedBy(),
+                    cardModel.getName(), cardModel.getAppointmentNo(), specializations, cardModel.getThana(),
+                    cardModel.getDistrict(), cardModel.getCardImageUrl(), cardModel.getCardOcrData());
+
+            cardInfoResponseList.add(cardInfoResponseV2);
+        }
+
+//        CardListResponse cardListResponse = new CardListResponse(pageNo, pageSize, cardModelList.isLast(),
+//                cardModelList.getTotalElements(), cardModelList.getTotalPages(), cardModelList.getContent());
+
+        CardListResponseV2 cardListResponse = new CardListResponseV2(pageNo, pageSize, cardModelList.isLast(),
+                cardModelList.getTotalElements(), cardModelList.getTotalPages(), cardInfoResponseList);
 
         return new ResponseEntity<>(cardListResponse, HttpStatus.OK);
 

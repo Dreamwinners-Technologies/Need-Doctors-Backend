@@ -4,7 +4,6 @@ import com.a2sdm.need.doctors.dto.request.DrugAddRequest;
 import com.a2sdm.need.doctors.dto.response.DrugListResponse;
 import com.a2sdm.need.doctors.dto.response.MessageIdResponse;
 import com.a2sdm.need.doctors.dto.response.MessageResponse;
-import com.a2sdm.need.doctors.dto.response.TestMedicineResponse;
 import com.a2sdm.need.doctors.model.DrugModel;
 import com.a2sdm.need.doctors.service.DrugService;
 import com.a2sdm.need.doctors.service.TestDrugService;
@@ -59,7 +58,8 @@ public class DrugController {
         System.out.println(brand);
 
 
-        return drugService.getDrugList(pageNo, pageSize, name, generic, brand);
+//        return drugService.getDrugList(pageNo, pageSize, name, generic, brand);
+        return testDrugService.getDrugList(pageNo, pageSize, name, generic, brand);
 
     }
 
@@ -115,7 +115,7 @@ public class DrugController {
 
     @GetMapping("/generic")
     public ResponseEntity getDrugListByGeneric(@RequestParam(required = false) String genericName,
-                                                            @RequestParam(required = false) Boolean isTest) {
+                                                            @RequestParam(required = false, defaultValue = "false") Boolean isTest) {
 
         if (genericName != null) {
             if (genericName.equals("null") || genericName.isEmpty()) {
