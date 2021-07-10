@@ -83,7 +83,7 @@ public class OTPAndJwtService {
         SendSmsService sendSmsService = new SendSmsService();
         String smsText = "Hi, Your Need Doctor's App's OTP is: " + otp + ".\nThanks";
 
-        return sendSmsService.sendSms(smsText, sendTo);
+        return sendSmsService.sendSmsNew(smsText, sendTo);
 
     }
 

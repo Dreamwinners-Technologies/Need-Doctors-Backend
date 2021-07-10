@@ -47,7 +47,7 @@ public class AdminPanelService {
             userRepository.save(userModel);
 
             String smsText = "Hello,\nYou are now a moderator of Need Doctor's App.\nThanks";
-            sendSmsService.sendSms(smsText, phoneNo);
+            sendSmsService.sendSmsNew(smsText, phoneNo);
 
             return new ResponseEntity<>(new MessageResponse("Moderator added to "+userModel.getName()), HttpStatus.OK);
         }
