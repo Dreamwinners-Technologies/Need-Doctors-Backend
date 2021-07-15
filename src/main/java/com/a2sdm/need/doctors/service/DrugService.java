@@ -2,6 +2,7 @@ package com.a2sdm.need.doctors.service;
 
 import com.a2sdm.need.doctors.dto.request.DrugAddRequest;
 import com.a2sdm.need.doctors.dto.response.DrugListResponse;
+import com.a2sdm.need.doctors.dto.response.GenericResponse;
 import com.a2sdm.need.doctors.dto.response.MessageIdResponse;
 import com.a2sdm.need.doctors.dto.response.MessageResponse;
 import com.a2sdm.need.doctors.model.DrugModel;
@@ -134,4 +135,5 @@ public class DrugService {
         return new ResponseEntity<>(genericNames, HttpStatus.OK);
 
     }
+
 }

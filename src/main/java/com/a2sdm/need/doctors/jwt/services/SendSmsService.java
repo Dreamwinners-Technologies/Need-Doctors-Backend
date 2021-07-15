@@ -44,7 +44,7 @@ public class SendSmsService {
         RestTemplate restTemplate = new RestTemplate();
 
         String apiKey = "C200043260e9221f4fec61.12460169";
-        String senderId = "8809612436500";
+        String senderId = "8809601001357";
         String apiUrl = "http://gsms.pw/smsapi";
 
         String finalUrl = apiUrl + "?api_key=" + apiKey + "&type=text&contacts=" + sendTo +
@@ -53,7 +53,7 @@ public class SendSmsService {
 //        System.out.println(finalUrl);
 
         ResponseEntity<String> response = restTemplate.getForEntity(finalUrl, String.class);
-
+//        System.out.println(response);
         if (response.getStatusCodeValue() != 200) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is a problem on SMS Server");
         }
