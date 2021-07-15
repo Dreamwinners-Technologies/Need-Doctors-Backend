@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @AllArgsConstructor
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/cards")
 public class CardInfoController {
