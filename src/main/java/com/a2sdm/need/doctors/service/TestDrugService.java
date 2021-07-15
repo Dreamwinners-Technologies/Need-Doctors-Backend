@@ -1,7 +1,7 @@
 package com.a2sdm.need.doctors.service;
 
 import com.a2sdm.need.doctors.dto.response.DrugListResponse;
-import com.a2sdm.need.doctors.dto.response.TestMedicineResponse;
+import com.a2sdm.need.doctors.dto.response.GenericResponse;
 import com.a2sdm.need.doctors.model.DrugModel;
 import com.a2sdm.need.doctors.model.TestCompanyNameModel;
 import com.a2sdm.need.doctors.model.TestGenericModel;
@@ -14,11 +14,11 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -61,9 +61,9 @@ public class TestDrugService {
                     testMedicineModel.getStrength(), testGenericModel.getIndication(), testGenericModel.getAdultDose(),
                     testGenericModel.getChildDose(), testGenericModel.getRenalDose(), testGenericModel.getAdministration(),
                     testGenericModel.getContraIndication(), testGenericModel.getSideEffect(), testGenericModel.getPrecaution(),
-                    testGenericModel.getPregnancyCategoryNote(), "",testGenericModel.getModeOfAction(),
+                    testGenericModel.getPregnancyCategoryNote(), "", testGenericModel.getModeOfAction(),
                     testGenericModel.getInteraction(),
-                    "Pack Size: "+testMedicineModel.getPackedSize()+"\nUnitPrice: "+testMedicineModel.getPrice()+" BDT");
+                    "Pack Size: " + testMedicineModel.getPackedSize() + "\nUnitPrice: " + testMedicineModel.getPrice() + " BDT");
 
             drugModelList.add(drugModel);
         }
@@ -95,5 +95,52 @@ public class TestDrugService {
 
         return new ResponseEntity<>(genericNames, HttpStatus.OK);
 
+    }
+
+    public ResponseEntity<List<GenericResponse>> getAllGenerics(String genericName, Integer pageNo, Integer pageSize) {
+        TestGenericModel exampleGeneric = new TestGenericModel();
+        exampleGeneric.setGenericName(genericName);
+
+        ExampleMatcher matcher = ExampleMatcher
+                .matchingAll()
+                .withMatcher("genericName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        Page<TestGenericModel> testGenericPage =
+                testGenericRepository.findAll(Example.of(exampleGeneric, matcher), pageable);
+
+        List<GenericResponse> genericResponses = new ArrayList<>();
+        for (TestGenericModel testGenericModel : testGenericPage.getContent()) {
+            GenericResponse genericResponse = new GenericResponse(testGenericModel.getGenericName(),
+                    testGenericModel.getGenericId());
+
+            genericResponses.add(genericResponse);
+        }
+
+        return new ResponseEntity<>(genericResponses, HttpStatus.OK);
+    }
+
+    public ResponseEntity<TestGenericModel> getGenericById(Integer genericId) {
+        Optional<TestGenericModel> testGenericModelOptional = testGenericRepository.findById(genericId);
+        if (testGenericModelOptional.isPresent()) {
+            return new ResponseEntity<>(testGenericModelOptional.get(), HttpStatus.OK);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Generic Found");
+        }
+    }
+
+    public ResponseEntity<String> editGeneric(Integer genericId, TestGenericModel testGeneric) {
+        Optional<TestGenericModel> testGenericModelOptional = testGenericRepository.findById(genericId);
+        if (testGenericModelOptional.isPresent()) {
+            testGeneric.setGenericId(testGenericModelOptional.get().getGenericId());
+
+            testGenericRepository.save(testGeneric);
+
+            return new ResponseEntity<>("Generic Edited", HttpStatus.OK);
+
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Generic Found");
+        }
     }
 }

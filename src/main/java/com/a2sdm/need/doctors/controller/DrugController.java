@@ -2,17 +2,19 @@ package com.a2sdm.need.doctors.controller;
 
 import com.a2sdm.need.doctors.dto.request.DrugAddRequest;
 import com.a2sdm.need.doctors.dto.response.DrugListResponse;
+import com.a2sdm.need.doctors.dto.response.GenericResponse;
 import com.a2sdm.need.doctors.dto.response.MessageIdResponse;
 import com.a2sdm.need.doctors.dto.response.MessageResponse;
 import com.a2sdm.need.doctors.model.DrugModel;
+import com.a2sdm.need.doctors.model.TestGenericModel;
 import com.a2sdm.need.doctors.service.DrugService;
 import com.a2sdm.need.doctors.service.TestDrugService;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @RestController
@@ -130,5 +132,24 @@ public class DrugController {
             return drugService.getDrugListByGeneric(genericName);
         }
 
+    }
+
+
+    @GetMapping("/generics")
+    public ResponseEntity<List<GenericResponse>> getAllGenerics(
+            @RequestParam(required = false) String genericName, @RequestParam(defaultValue = "0")Integer pageNo,
+            @RequestParam(defaultValue = "50") Integer pageSize){
+        return testDrugService.getAllGenerics(genericName, pageNo, pageSize);
+    }
+
+    @GetMapping("/generics/{genericId}")
+    public ResponseEntity<TestGenericModel> getGenericById(@PathVariable Integer genericId){
+        return testDrugService.getGenericById(genericId);
+    }
+
+    @PutMapping("/generics/{genericId}")
+    public ResponseEntity<String> editGenerics(@PathVariable Integer genericId,
+                                               @RequestBody TestGenericModel testGenericModel){
+        return testDrugService.editGeneric(genericId, testGenericModel);
     }
 }
